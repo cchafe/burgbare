@@ -26,8 +26,3 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     burgalgorithm.h
-
-LIBS += -lstk
-
-DISTFILES += \
-    recordedLost.dat
