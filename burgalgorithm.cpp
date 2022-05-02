@@ -1,18 +1,5 @@
 #include "burgalgorithm.h"
 #include <QDebug>
-#include <stk/Stk.h>
-
-using namespace std;
-using namespace stk;
-
-
-QString qStringFromLongDouble1(const long double myLongDouble)
-{
-    std::stringstream ss;
-    ss << myLongDouble;
-
-    return QString::fromStdString(ss.str());
-}
 
 bool classify(double d)
 {
