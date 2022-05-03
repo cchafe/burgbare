@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 //    FileIO lossFile;
 //    lossFile.openReadStream("recordedLost.dat");
     //    qDebug() << lossFile.readInt();
-    BurgAlgorithm ba;
+    BurgAlgorithmX ba;
     vector<vector<float>> output(1,vector<float>( TOTALSAMPS,0.0));
     qDebug() << "output.size()" << output.size() << "x" << output.at(0).size();
     //    vector<double> output( TOTALSAMPS, 0.0 );

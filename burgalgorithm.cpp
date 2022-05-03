@@ -17,7 +17,7 @@ bool classify(double d)
 
 
 // from .pl
-void BurgAlgorithm::train(vector<long double> &coeffs, const vector<float> &x, int pCnt )
+void BurgAlgorithmX::train(vector<long double> &coeffs, const vector<float> &x, int pCnt )
 {
 
     // GET SIZE FROM INPUT VECTORS
@@ -117,7 +117,7 @@ void BurgAlgorithm::train(vector<long double> &coeffs, const vector<float> &x, i
 
 }
 
-void BurgAlgorithm::predict( vector<long double> &coeffs, vector<float> &tail )
+void BurgAlgorithmX::predict( vector<long double> &coeffs, vector<float> &tail )
 {
     size_t m = coeffs.size();
 //    qDebug() << "tail.at(0)" << tail[0]*32768;
