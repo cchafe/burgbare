@@ -4,6 +4,7 @@
 #include "burgalgorithm.h"
 #include <iostream>
 #include <QLoggingCategory>
+#include "Regulator.h"
 
 #define FS 48000.0
 QStringList runType = { "orig", "loss", "zero", "fade", "pred", "pure" };
@@ -114,7 +115,9 @@ int main(int argc, char *argv[])
 //    FileIO lossFile;
 //    lossFile.openReadStream("recordedLost.dat");
     //    qDebug() << lossFile.readInt();
-    BurgAlgorithm ba;
+
+    Regulator* reg = new Regulator( 2, 16, 128, 15 );
+
     vector<vector<float>> output(1,vector<float>( TOTALSAMPS,0.0));
     qDebug() << "output.size()" << output.size() << "x" << output.at(0).size();
     //    vector<double> output( TOTALSAMPS, 0.0 );
@@ -196,12 +199,12 @@ int main(int argc, char *argv[])
                 //                qDebug() << train.size();
 
                 // GET LINEAR PREDICTION COEFFICIENTS
-                ba.train( coeffs, train, pCnt );
+                reg->ba.train( coeffs, train, pCnt );
 
                 // LINEAR PREDICT DATA
                 vector<float> tail( train );
 
-                ba.predict( coeffs, tail ); // resizes to TRAINSAMPS-2 + TRAINSAMPS
+                reg->ba.predict( coeffs, tail ); // resizes to TRAINSAMPS-2 + TRAINSAMPS
 
                 for ( int i = 0; i < ORDER; i++ )
                     prediction[i] = tail[i+TRAINSAMPS];

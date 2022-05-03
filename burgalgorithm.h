@@ -12,4 +12,5 @@ public:
     void predict( vector<long double> &coeffs, vector<float> &predicted );
 };
 
+
 #endif // BURGALGORITHM_H
