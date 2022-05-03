@@ -51,7 +51,7 @@
 //#include "RingBuffer.h"
 typedef float sample_t;
 #define mBitResolutionMode 16
-#define gVerboseFlag false
+#define gVerboseFlag true
 
 class BurgAlgorithm
 {

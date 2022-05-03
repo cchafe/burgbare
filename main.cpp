@@ -4,6 +4,7 @@
 #include "burgalgorithm.h"
 #include <iostream>
 #include <QLoggingCategory>
+#include "Regulator.h"
 
 #define FS 48000.0
 QStringList runType = { "orig", "loss", "zero", "fade", "pred", "pure" };
@@ -52,6 +53,14 @@ int skip = 0;
 #define TOTALSAMPS (fpp*plen)
 
 ///////////////////////////////////////////////////////
+bool inputOnePacket(Regulator * reg, const int8_t* ptrToSlot, int len, int lostLen) // aka writeAudioBuffer
+{
+    return reg->insertSlotNonBlocking(ptrToSlot, len, lostLen);
+}
+void outputOnePacket(Regulator * reg, int8_t* ptrToReadSlot) // aka receiveNetworkPacket
+{
+    reg->readSlotNonBlocking(ptrToReadSlot);
+}
 
 void qtMessageHandler([[maybe_unused]] QtMsgType type,
 [[maybe_unused]] const QMessageLogContext& context,
@@ -103,18 +112,19 @@ int main(int argc, char *argv[])
 
     if (hist >= rate)
         qDebug() << "!!!!!!!!!!! ------------- hist >= rate" << hist << rate;
-//    WavFileIO iwv;
+    //    WavFileIO iwv;
     //    iwv.openIFile(IFILENAME, (skip<TRAINSAMPS)?TRAINSAMPS:skip);
 
-//    WavFileIO owv;
+    //    WavFileIO owv;
     //    FileIO log;
     //    log.openStream("/tmp/error.dat");
     //    log.openStream("/tmp/coeffs.dat");
 
-//    FileIO lossFile;
-//    lossFile.openReadStream("recordedLost.dat");
+    //    FileIO lossFile;
+    //    lossFile.openReadStream("recordedLost.dat");
     //    qDebug() << lossFile.readInt();
     BurgAlgorithmX ba;
+    Regulator reg(1, 16, fpp, 15);
     vector<vector<float>> output(1,vector<float>( TOTALSAMPS,0.0));
     qDebug() << "output.size()" << output.size() << "x" << output.at(0).size();
     //    vector<double> output( TOTALSAMPS, 0.0 );
