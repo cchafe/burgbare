@@ -1,5 +1,6 @@
 # burgbare
-stripped down burg's algorithm for testing
+stripped down burg's algorithm for testing  
+  
 qmake-qt5  
 make  
 time ./burgBare 48000 128 3 5 600 100 0 1 1  
