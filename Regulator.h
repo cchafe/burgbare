@@ -84,6 +84,9 @@ class ChanData
     std::vector<sample_t> mCrossFadeDown;
     std::vector<sample_t> mCrossFadeUp;
     std::vector<sample_t> mCrossfade;
+    ///////////////////////////////////////////////////////
+    double phasor = 0.0;
+    ///////////////////////////////////////////////////////
 };
 
 class StdDev
@@ -103,7 +106,8 @@ class StdDev
     double longTermStdDev;
     double longTermStdDevAcc;
     double longTermMax;
-    double longTermMaxAcc;
+    double longTermMaxAcc;#define PACKETSAMP ( int s = 0; s < fpp; s++ )
+
 
    private:
     void reset();
@@ -142,8 +146,23 @@ class Regulator // : public RingBuffer
 
     virtual void readSlotNonBlocking(int8_t* ptrToReadSlot) { pullPacket(ptrToReadSlot); }
 
+    ///////////////////////////////////////////////////////
 //    //    virtual QString getStats(uint32_t statCount, uint32_t lostCount);
 //    virtual bool getStats(IOStat* stat, bool reset);
+    ///////////////////////////////////////////////////////
+    bool inputOnePacket(const int8_t* ptrToSlot, int len, int lostLen) // aka writeAudioBuffer
+    {
+        for ( int s = 0; s < mFPP; s++ ) {
+            ptrToSlot[s] = 0.3*sin(mChanData[0]->phasor);
+            mChanData[0]-> += 0.1;
+        }
+        return insertSlotNonBlocking(ptrToSlot, len, lostLen);
+    }
+    void outputOnePacket(int8_t* ptrToReadSlot) // aka receiveNetworkPacket
+    {
+        readSlotNonBlocking(ptrToReadSlot);
+    }
+    ///////////////////////////////////////////////////////
 
    private:
     void setFPPratio();

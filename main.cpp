@@ -52,16 +52,6 @@ int skip = 0;
 #define SKIP(x) (x-TRAINSAMPS)
 #define TOTALSAMPS (fpp*plen)
 
-///////////////////////////////////////////////////////
-bool inputOnePacket(Regulator * reg, const int8_t* ptrToSlot, int len, int lostLen) // aka writeAudioBuffer
-{
-    return reg->insertSlotNonBlocking(ptrToSlot, len, lostLen);
-}
-void outputOnePacket(Regulator * reg, int8_t* ptrToReadSlot) // aka receiveNetworkPacket
-{
-    reg->readSlotNonBlocking(ptrToReadSlot);
-}
-
 void qtMessageHandler([[maybe_unused]] QtMsgType type,
 [[maybe_unused]] const QMessageLogContext& context,
 const QString& msg)
@@ -132,6 +122,11 @@ int main(int argc, char *argv[])
     vector<float> prediction( TRAINSAMPS-1 ); // ORDER
     vector<long double> coeffs( TRAINSAMPS-2, 0.0 );
     vector<float> truth( fpp, 0.0 );
+
+    int len = (1 * mBitResolutionMode) * fpp; // 1 chan
+    const int8_t* mTruth;
+    mTruth = new int8_t[len / 8];
+
     vector<float> xfadedPred( fpp, 0.0 );
     vector<float> nextPred( fpp, 0.0 );
     vector<float> lastGoodPacket( fpp, 0.0 );
@@ -173,6 +168,7 @@ int main(int argc, char *argv[])
             phasor += 0.1;
         }
         //        qDebug() << pCnt;
+reg.inputOnePacket(mTruth, len, pCnt); // --not initialized yet
         glitch = !((pCnt-off)%rate);
         if (stoc>0) {
             glitch = false;
