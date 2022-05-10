@@ -4,10 +4,13 @@
 #include "burgalgorithm.h"
 #include <iostream>
 #include <QLoggingCategory>
+#include <stk/Stk.h>
+#include "wavfileio.h"
+using namespace stk;
 
 #define FS 48000.0
-QStringList runType = { "orig", "loss", "zero", "fade", "pred", "pure" };
-enum Param { dummy, p_skip, p_fpp, p_run, p_hist, p_plen,
+QStringList runType = { "orig", "loss", "zero", "fade", "pred", "pure", "resi" };
+enum Param { dummy, p_ifile, p_skip, p_fpp, p_run, p_hist, p_plen,
              p_rate, p_off, p_cons, p_stoc, p_ofile, p_lfile };
 int LOST[] = { 0, 2, 15, 16, 24, 26, 69, 70, 71, 72, 95, 97, 99, 344, 465, 466, 467, 644, 645, 702, 703, 704, 722, 723, 724, 872, 873, 980, 1110, 1111, 1112, 1321, 1322, 1407, 1408, 1409, 1411, 1415, 1416, 1417, 1418, 1465, 1477, 1479, 1531, 1532, 1533, 1534, 1710, 1719, 1720, 1721, 1722, 1724, 2060, 2061, 2062, 2063, 2114, 2115, 2116, 2235, 2236, 2237, 2238, 2239, 2240, 2241, 2249, 2250, 2251, 2273, 2390, 2391, 2392, 2393, 2399, 2408, 2600, 2601, 2602, 2635, 2688, 2689, 2849, 2850, 2869, 2870, 2871, 2872, 2919, 2920, 3103, 3104, 3269, 3270, 3308, 3309, 3343, 3344, 3345, 3346, 3404, 3405, 3406, 3438, 3439, 3472, 3488, 3489, 3558, 3559, 3560, 3722, 3723, 3830, 3831, 4034, 4044, 4045, 4115, 4116, 4117, 4118, 4190, 4191, 4192, 4194, 4322, 4323, 4352, 4353, 4359, 4956, 4957, 5206, 5207, 5759, 5845, 5848, 5849, 5866, 6006, 6007, 6039, 6040, 6103, 6104, 6148, 6149, 6175, 6176, 6177, 6179 };
 int LOSTLEN = 154;
@@ -31,6 +34,11 @@ int LOSTLEN = 154;
 #define STOC false
 
 // parameters
+QString idir = "/tmp/";
+QString shortIName = "input";
+QString odir = "/tmp/";
+QString shortOName = "test";
+QString dotWav (".wav");
 int fpp = FPP;
 int hist = HIST;
 int run = RUN;
@@ -64,6 +72,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     QLoggingCategory::setFilterRules(QStringLiteral("*.debug=true"));
+    Stk::setSampleRate(FS);
     qInstallMessageHandler(qtMessageHandler);
     qDebug() << "preloaded" << LOSTLEN << "packet numbers (from recording):" << LOST[0] << ":" << LOST[LOSTLEN-1];
     qDebug() << (runType[run]);
@@ -72,7 +81,7 @@ int main(int argc, char *argv[])
         QString tmpStr = QString::fromStdString(argv[i]);
         switch(i)
         {
-        //        case p_ifile  : shortIName = tmpStr;  break;
+        case p_ifile  : shortIName = tmpStr;  break;
         case p_skip  : skip = tmpStr.toInt();  break;
         case p_fpp  : fpp = tmpStr.toInt();  break;
         case p_run  : run = tmpStr.toInt();  break;
@@ -82,37 +91,37 @@ int main(int argc, char *argv[])
         case p_off  : off = tmpStr.toInt();  break;
         case p_cons  : cons = tmpStr.toInt();  break;
         case p_stoc  : stoc = tmpStr.toInt();  break;
-            //        case p_ofile  : shortOName = tmpStr;  break;
+        case p_ofile  : shortOName = tmpStr;  break;
             //        case p_lfile  : shortLName = tmpStr;  break;
         }
     }
 
 #define DPY(x,y) << x << y
-    qDebug() // << shortIName
-            DPY("skip",skip)
-            DPY("fpp",fpp)
-            DPY("run",run)
-            DPY("hist",hist)
-            DPY("plen",plen)
-            DPY("rate",rate)
-            DPY("off",off)
-            DPY("cons",cons)
-            DPY("stoc",stoc)
-            //             << shortOName << shortLName
-            ;
+    qDebug() << shortIName
+                DPY("skip",skip)
+                DPY("fpp",fpp)
+                DPY("run",run)
+                DPY("hist",hist)
+                DPY("plen",plen)
+                DPY("rate",rate)
+                DPY("off",off)
+                DPY("cons",cons)
+                DPY("stoc",stoc)
+                //             << shortOName << shortLName
+                ;
 
     if (hist >= rate)
         qDebug() << "!!!!!!!!!!! ------------- hist >= rate" << hist << rate;
-//    WavFileIO iwv;
-    //    iwv.openIFile(IFILENAME, (skip<TRAINSAMPS)?TRAINSAMPS:skip);
+    WavFileIO iwv;
+    iwv.openIFile(IFILENAME, (skip<TRAINSAMPS)?TRAINSAMPS:skip);
 
-//    WavFileIO owv;
+    WavFileIO owv;
     //    FileIO log;
     //    log.openStream("/tmp/error.dat");
     //    log.openStream("/tmp/coeffs.dat");
 
-//    FileIO lossFile;
-//    lossFile.openReadStream("recordedLost.dat");
+    //    FileIO lossFile;
+    //    lossFile.openReadStream("recordedLost.dat");
     //    qDebug() << lossFile.readInt();
     BurgAlgorithm ba;
     vector<vector<float>> output(1,vector<float>( TOTALSAMPS,0.0));
@@ -155,13 +164,17 @@ int main(int argc, char *argv[])
         //        double mSimulatedLossRate;
         //        double mSimulatedJitterRate;
         //        double mSimulatedJitterMaxDelay;
-        //        iwv.readFramesFromFor(THISPACKET, fpp, 1.0);
 
-        //        for PACKETSAMP truth[s] = iwv.iframes.at(s);
-        for PACKETSAMP {
-            truth[s] = 0.3*sin(phasor);
-            phasor += 0.1;
-        }
+        iwv.readFramesFromFor(THISPACKET, fpp, 1.0);
+        for PACKETSAMP truth[s] = iwv.iframes.at(s);
+//                for PACKETSAMP {
+//                    truth[s] = 0.3*sin(phasor);
+//                    phasor += 0.1;
+//                }
+//                        for PACKETSAMP {
+//                            truth[s] = (s==0) ? 0.5 : 0.3*sin(phasor);
+//                            phasor += 0.1;
+//                        }
         //        qDebug() << pCnt;
         glitch = !((pCnt-off)%rate);
         if (stoc>0) {
@@ -231,6 +244,14 @@ int main(int argc, char *argv[])
                     break;
                 case 5  : OUT(0,s) = prediction[s];
                     break;
+                case 6  : {
+                    double tmp = prediction[s] * fadeUp[s] +
+                            nextPred[s] * fadeDown[s];
+                    OUT(0,s) = (s==0) ? tmp : tmp;
+                    // predicted fade up, last predicted fade down
+                    glitch = false;
+                }
+                    break;
                 }
                 //                plot.write(OUT(0,s));
             }
@@ -250,7 +271,7 @@ int main(int argc, char *argv[])
         if (!glitch) for PACKETSAMP lastGoodPacket[s] = truth[s];
 
     }
-    //    owv.writeFrames(OFILENAME, output);
+    owv.writeFrames(OFILENAME, output);
     //    return a.exec();
     qDebug() << 100.0*(double)glitchCnt / (double)plen << "% loss";
     qDebug() << maxCons << "max consecutive";
