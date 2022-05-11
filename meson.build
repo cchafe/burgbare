@@ -25,11 +25,10 @@ src = [	'burgalgorithm.cpp',
 ui_h = []
 qres = []
 deps = dependency('qt5', modules: ['Core', 'Gui', 'Network', 'Widgets'], include_type: 'system')
-#deps += dependency('stk', include_type: 'system')
 cc = meson.get_compiler('c')
-dep += declare_dependency(
-  dependencies : cc.find_library('stk', dirs : [meson.current_source_dir()]),
-  include_directories : include_directories('.'),
-)
-burgbare = executable('burgbare', src, include_directories: incdirs, c_args: c_defines, dependencies: deps, cpp_args: defines )
+lib_stk = cc.find_library('stk',
+               dirs : ['/usr/lib64/stk'])
+inc_stk = include_directories('/usr/include/stk')
+incdirs += [inc_stk]
+burgbare = executable('burgbare', src, include_directories: incdirs, c_args: c_defines, dependencies: [deps,lib_stk], cpp_args: defines )
 
