@@ -16,6 +16,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        AudioInterface.cpp \
+        Regulator.cpp \
         burgalgorithm.cpp \
         main.cpp \
         wavfileio.cpp
@@ -26,6 +28,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    AudioInterface.h \
+    Regulator.h \
     burgalgorithm.h \
     wavfileio.h
 LIBS += -lstk

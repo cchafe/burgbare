@@ -7,6 +7,7 @@
 #include <stk/Stk.h>
 #include "wavfileio.h"
 using namespace stk;
+#include "Regulator.h"
 
 #define FS 48000.0
 QStringList runType = { "orig", "loss", "zero", "fade", "pred", "pure", "resi" };
@@ -58,8 +59,6 @@ int skip = 0;
 #define ORDER (TRAINSAMPS-1)
 #define SKIP(x) (x-TRAINSAMPS)
 #define TOTALSAMPS (fpp*plen)
-
-///////////////////////////////////////////////////////
 
 void qtMessageHandler([[maybe_unused]] QtMsgType type,
 [[maybe_unused]] const QMessageLogContext& context,
@@ -123,7 +122,8 @@ int main(int argc, char *argv[])
     //    FileIO lossFile;
     //    lossFile.openReadStream("recordedLost.dat");
     //    qDebug() << lossFile.readInt();
-    BurgAlgorithm ba;
+    BurgAlgorithmX ba;
+    Regulator regu(1, 16, fpp, 15);
     vector<vector<float>> output(1,vector<float>( TOTALSAMPS,0.0));
     qDebug() << "output.size()" << output.size() << "x" << output.at(0).size();
     //    vector<double> output( TOTALSAMPS, 0.0 );
@@ -131,6 +131,13 @@ int main(int argc, char *argv[])
     vector<float> prediction( TRAINSAMPS-1 ); // ORDER
     vector<long double> coeffs( TRAINSAMPS-2, 0.0 );
     vector<float> truth( fpp, 0.0 );
+
+    int len = (1 * mBitResolutionMode) * fpp; // 1 chan
+    const int8_t* truthTmp;
+    truthTmp = new int8_t[len / 8];
+    int8_t* outTmp;
+    outTmp = new int8_t[len / 8];
+
     vector<float> xfadedPred( fpp, 0.0 );
     vector<float> nextPred( fpp, 0.0 );
     vector<float> lastGoodPacket( fpp, 0.0 );
@@ -176,6 +183,7 @@ int main(int argc, char *argv[])
         //                            phasor += 0.01;
         //                        }
         //        qDebug() << pCnt;
+regu.inputOnePacket(truthTmp, len, pCnt); // --not initialized yet
         glitch = !((pCnt-off)%rate);
         if (stoc>0) {
             glitch = false;
@@ -226,6 +234,8 @@ int main(int argc, char *argv[])
                         nextPred[s] * fadeDown[s];
             }
 #define OUT(ch,x) (output[ch][THISPACKET+x])
+            regu.outputOnePacket(outTmp);
+
             for PACKETSAMP {
                 switch(run)
                 {
@@ -254,6 +264,7 @@ int main(int argc, char *argv[])
                     // predicted fade up, last predicted fade down
                     glitch = false;
                 }
+                case 7  : OUT(0,s) = outTmp[s];
                     break;
                 }
                 //                plot.write(OUT(0,s));

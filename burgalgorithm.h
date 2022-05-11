@@ -5,7 +5,7 @@
 #include <vector>
 using namespace std;
 
-class BurgAlgorithm
+class BurgAlgorithmX
 {
 public:
     void train(vector<long double> &coeffs, const vector<float> &x, int pCnt);
