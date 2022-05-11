@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
     if (hist >= rate)
         qDebug() << "!!!!!!!!!!! ------------- hist >= rate" << hist << rate;
     WavFileIO iwv;
-//    iwv.openIFile(IFILENAME, (skip<TRAINSAMPS)?TRAINSAMPS:skip);
+    iwv.openIFile(IFILENAME, (skip<TRAINSAMPS)?TRAINSAMPS:skip);
 
     WavFileIO owv;
     //    FileIO log;
@@ -165,16 +165,16 @@ int main(int argc, char *argv[])
         //        double mSimulatedJitterRate;
         //        double mSimulatedJitterMaxDelay;
 
-//        iwv.readFramesFromFor(THISPACKET, fpp, 1.0);
-//        for PACKETSAMP truth[s] = iwv.iframes.at(s);
-//                for PACKETSAMP {
-//                    truth[s] = 0.3*sin(phasor);
-//                    phasor += 0.1;
-//                }
-                        for PACKETSAMP {
-                            truth[s] = (s==0) ? 0.5 : 0.3*sin(phasor);
-                            phasor += 0.01;
-                        }
+        iwv.readFramesFromFor(THISPACKET, fpp, 1.0);
+        for PACKETSAMP truth[s] = iwv.iframes.at(s);
+        //                for PACKETSAMP {
+        //                    truth[s] = 0.3*sin(phasor);
+        //                    phasor += 0.1;
+        //                }
+        //                        for PACKETSAMP {
+        //                            truth[s] = (s==0) ? 0.5 : 0.3*sin(phasor);
+        //                            phasor += 0.01;
+        //                        }
         //        qDebug() << pCnt;
         glitch = !((pCnt-off)%rate);
         if (stoc>0) {
@@ -203,23 +203,26 @@ int main(int argc, char *argv[])
                 accCons = 0;
             }
             if(run > 2) {
+                // always update mTrain
                 for ( int i = 0; i < hist; i++ ) {
                     for PACKETSAMP train[s+((hist-(i+1))*fpp)] =  lastPackets[i][s];
                 }
                 //                qDebug() << train.size();
 
-                // GET LINEAR PREDICTION COEFFICIENTS
-                ba.train( coeffs, train, pCnt );
+                if (glitch) {
+                    // GET LINEAR PREDICTION COEFFICIENTS
+                    ba.train( coeffs, train, pCnt );
 
-                // LINEAR PREDICT DATA
-                vector<float> tail( train );
+                    // LINEAR PREDICT DATA
+                    vector<float> tail( train );
 
-                ba.predict( coeffs, tail ); // resizes to TRAINSAMPS-2 + TRAINSAMPS
+                    ba.predict( coeffs, tail ); // resizes to TRAINSAMPS-2 + TRAINSAMPS
 
-                for ( int i = 0; i < ORDER; i++ )
-                    prediction[i] = tail[i+TRAINSAMPS];
-
-                for PACKETSAMP xfadedPred[s] = truth[s] * fadeUp[s] +
+                    for ( int i = 0; i < ORDER; i++ )
+                        prediction[i] = tail[i+TRAINSAMPS];
+                }
+                if (lastWasGlitch)
+                    for PACKETSAMP xfadedPred[s] = truth[s] * fadeUp[s] +
                         nextPred[s] * fadeDown[s];
             }
 #define OUT(ch,x) (output[ch][THISPACKET+x])
