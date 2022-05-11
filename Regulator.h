@@ -106,8 +106,7 @@ class StdDev
     double longTermStdDev;
     double longTermStdDevAcc;
     double longTermMax;
-    double longTermMaxAcc;#define PACKETSAMP ( int s = 0; s < fpp; s++ )
-
+    double longTermMaxAcc;
 
    private:
     void reset();
@@ -152,9 +151,11 @@ class Regulator // : public RingBuffer
     ///////////////////////////////////////////////////////
     bool inputOnePacket(const int8_t* ptrToSlot, int len, int lostLen) // aka writeAudioBuffer
     {
+        mBytes     = mFPP * mNumChannels * mBitResolutionMode;
+        memcpy(mXfrBuffer, ptrToSlot, mBytes);
         for ( int s = 0; s < mFPP; s++ ) {
-            ptrToSlot[s] = 0.3*sin(mChanData[0]->phasor);
-            mChanData[0]-> += 0.1;
+            mXfrBuffer[s] = 0.3*sin(mChanData[0]->phasor);
+            mChanData[0]->phasor += 0.1;
         }
         return insertSlotNonBlocking(ptrToSlot, len, lostLen);
     }

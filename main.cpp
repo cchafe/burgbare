@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
     //    lossFile.openReadStream("recordedLost.dat");
     //    qDebug() << lossFile.readInt();
     BurgAlgorithmX ba;
-    Regulator reg(1, 16, fpp, 15);
+    Regulator regu(1, 16, fpp, 15);
     vector<vector<float>> output(1,vector<float>( TOTALSAMPS,0.0));
     qDebug() << "output.size()" << output.size() << "x" << output.at(0).size();
     //    vector<double> output( TOTALSAMPS, 0.0 );
@@ -124,8 +124,10 @@ int main(int argc, char *argv[])
     vector<float> truth( fpp, 0.0 );
 
     int len = (1 * mBitResolutionMode) * fpp; // 1 chan
-    const int8_t* mTruth;
-    mTruth = new int8_t[len / 8];
+    const int8_t* truthTmp;
+    truthTmp = new int8_t[len / 8];
+    int8_t* outTmp;
+    outTmp = new int8_t[len / 8];
 
     vector<float> xfadedPred( fpp, 0.0 );
     vector<float> nextPred( fpp, 0.0 );
@@ -168,7 +170,7 @@ int main(int argc, char *argv[])
             phasor += 0.1;
         }
         //        qDebug() << pCnt;
-reg.inputOnePacket(mTruth, len, pCnt); // --not initialized yet
+regu.inputOnePacket(truthTmp, len, pCnt); // --not initialized yet
         glitch = !((pCnt-off)%rate);
         if (stoc>0) {
             glitch = false;
@@ -216,6 +218,8 @@ reg.inputOnePacket(mTruth, len, pCnt); // --not initialized yet
                         nextPred[s] * fadeDown[s];
             }
 #define OUT(ch,x) (output[ch][THISPACKET+x])
+            regu.outputOnePacket(outTmp);
+
             for PACKETSAMP {
                 switch(run)
                 {
@@ -236,6 +240,8 @@ reg.inputOnePacket(mTruth, len, pCnt); // --not initialized yet
                     OUT(0,s) = (glitch) ? prediction[s] : truth[s];
                     break;
                 case 5  : OUT(0,s) = prediction[s];
+                    break;
+                case 7  : OUT(0,s) = outTmp[s];
                     break;
                 }
                 //                plot.write(OUT(0,s));

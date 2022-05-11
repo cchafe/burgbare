@@ -239,10 +239,10 @@ void Regulator::printParams(){
 
 Regulator::~Regulator()
 {
-    delete mXfrBuffer;
-    delete mZeros;
-    for (int i = 0; i < mNumChannels; i++)
-        delete mChanData[i];
+//    delete mXfrBuffer;
+//    delete mZeros;
+//    for (int i = 0; i < mNumChannels; i++)
+//        delete mChanData[i];
 }
 
 void Regulator::setFPPratio()
@@ -267,6 +267,7 @@ void Regulator::setFPPratio()
 //*******************************************************************************
 void Regulator::shimFPP(const int8_t* buf, int len, int seq_num)
 {
+    qDebug() << seq_num;
     if (seq_num != -1) {
         if (!mFPPratioIsSet) {  // first peer packet
             mPeerFPP = len / (mNumChannels * mBitResolutionMode);
