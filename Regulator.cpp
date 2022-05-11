@@ -267,7 +267,6 @@ void Regulator::setFPPratio()
 //*******************************************************************************
 void Regulator::shimFPP(const int8_t* buf, int len, int seq_num)
 {
-    qDebug() << seq_num;
     if (seq_num != -1) {
         if (!mFPPratioIsSet) {  // first peer packet
             mPeerFPP = len / (mNumChannels * mBitResolutionMode);
