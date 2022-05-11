@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
     if (hist >= rate)
         qDebug() << "!!!!!!!!!!! ------------- hist >= rate" << hist << rate;
     WavFileIO iwv;
-    iwv.openIFile(IFILENAME, (skip<TRAINSAMPS)?TRAINSAMPS:skip);
+//    iwv.openIFile(IFILENAME, (skip<TRAINSAMPS)?TRAINSAMPS:skip);
 
     WavFileIO owv;
     //    FileIO log;
@@ -165,16 +165,16 @@ int main(int argc, char *argv[])
         //        double mSimulatedJitterRate;
         //        double mSimulatedJitterMaxDelay;
 
-        iwv.readFramesFromFor(THISPACKET, fpp, 1.0);
-        for PACKETSAMP truth[s] = iwv.iframes.at(s);
+//        iwv.readFramesFromFor(THISPACKET, fpp, 1.0);
+//        for PACKETSAMP truth[s] = iwv.iframes.at(s);
 //                for PACKETSAMP {
 //                    truth[s] = 0.3*sin(phasor);
 //                    phasor += 0.1;
 //                }
-//                        for PACKETSAMP {
-//                            truth[s] = (s==0) ? 0.5 : 0.3*sin(phasor);
-//                            phasor += 0.1;
-//                        }
+                        for PACKETSAMP {
+                            truth[s] = (s==0) ? 0.5 : 0.3*sin(phasor);
+                            phasor += 0.01;
+                        }
         //        qDebug() << pCnt;
         glitch = !((pCnt-off)%rate);
         if (stoc>0) {
