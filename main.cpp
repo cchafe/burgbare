@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     if (hist >= rate)
         qDebug() << "!!!!!!!!!!! ------------- hist >= rate" << hist << rate;
     WavFileIO iwv;
-    iwv.openIFile(IFILENAME, (skip<TRAINSAMPS)?TRAINSAMPS:skip);
+    if (shortIName!="none") iwv.openIFile(IFILENAME, (skip<TRAINSAMPS)?TRAINSAMPS:skip);
 
     WavFileIO owv;
     //    FileIO log;
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
     //    lossFile.openReadStream("recordedLost.dat");
     //    qDebug() << lossFile.readInt();
     BurgAlgorithmX ba;
-    Regulator regu(1, 16, fpp, 15);
+    Regulator regu(1, 2, fpp, 15); // 2 = 16b
     vector<vector<float>> output(1,vector<float>( TOTALSAMPS,0.0));
     qDebug() << "output.size()" << output.size() << "x" << output.at(0).size();
     //    vector<double> output( TOTALSAMPS, 0.0 );
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 
     int len = (1 * 16) * fpp; // 1 chan, 16b
     const int8_t* unusedTmp;
-//    truthTmp = new int8_t[len / 8];
+    //    truthTmp = new int8_t[len / 8];
     int8_t* outTmp;
     outTmp = new int8_t[len / 8];
     std::memset(outTmp,0,len / 8);
@@ -176,8 +176,10 @@ int main(int argc, char *argv[])
         //        double mSimulatedJitterRate;
         //        double mSimulatedJitterMaxDelay;
 
-        iwv.readFramesFromFor(THISPACKET, fpp, 1.0);
-        for PACKETSAMP truth[s] = iwv.iframes.at(s);
+        if (shortIName!="none") {
+            iwv.readFramesFromFor(THISPACKET, fpp, 1.0);
+            for PACKETSAMP truth[s] = iwv.iframes.at(s);
+        }
         //                for PACKETSAMP {
         //                    truth[s] = 0.3*sin(phasor);
         //                    phasor += 0.1;
@@ -187,7 +189,7 @@ int main(int argc, char *argv[])
         //                            phasor += 0.01;
         //                        }
         //        qDebug() << pCnt;
-regu.inputOnePacket(unusedTmp, len, pCnt); // --not initialized yet
+        regu.inputOnePacket(unusedTmp, len, pCnt); // --not initialized yet
         glitch = !((pCnt-off)%rate);
         if (stoc>0) {
             glitch = false;
@@ -271,7 +273,7 @@ regu.inputOnePacket(unusedTmp, len, pCnt); // --not initialized yet
                 }
                 case 7  : {
                     OUT(0,s) = outTmp[s];
-}
+                }
                     break;
                 }
                 //                plot.write(OUT(0,s));

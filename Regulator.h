@@ -177,7 +177,7 @@ class Regulator // : public RingBuffer
     uint32_t mLastLostCount;
     int mNumSlots;
     int mHist;
-//    AudioInterface::audioBitResolutionT mBitResolutionMode;
+    AudioInterface::audioBitResolutionT mBitResolutionMode;
     BurgAlgorithm ba;
     int mBytes;
     int mBytesPeerPacket;

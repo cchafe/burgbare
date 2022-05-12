@@ -139,20 +139,20 @@ Regulator::Regulator(int rcvChannels, int bit_res, int FPP, int qLen)
                   << " larger than max FPP = " << MaxFPP << "\n";
         exit(1);
     }
-//    switch (mAudioBitRes) {  // int from JitterBuffer to AudioInterface enum
-//    case 1:
-//        mBitResolutionMode = AudioInterface::audioBitResolutionT::BIT8;
-//        break;
-//    case 2:
-//        mBitResolutionMode = AudioInterface::audioBitResolutionT::BIT16;
-//        break;
-//    case 3:
-//        mBitResolutionMode = AudioInterface::audioBitResolutionT::BIT24;
-//        break;
-//    case 4:
-//        mBitResolutionMode = AudioInterface::audioBitResolutionT::BIT32;
-//        break;
-//    }
+    switch (mAudioBitRes) {  // int from JitterBuffer to AudioInterface enum
+    case 1:
+        mBitResolutionMode = AudioInterface::audioBitResolutionT::BIT8;
+        break;
+    case 2:
+        mBitResolutionMode = AudioInterface::audioBitResolutionT::BIT16;
+        break;
+    case 3:
+        mBitResolutionMode = AudioInterface::audioBitResolutionT::BIT24;
+        break;
+    case 4:
+        mBitResolutionMode = AudioInterface::audioBitResolutionT::BIT32;
+        break;
+    }
     mHist        = HIST;  // at FPP 32
     int fppRatio = mFPP / 32;
     mHist /= fppRatio;
