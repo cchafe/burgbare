@@ -241,7 +241,7 @@ int main(int argc, char *argv[])
             }
 #define OUT(ch,x) (output[ch][THISPACKET+x])
             regu.outputOnePacket(outTmp);
-            outTmp[1] = 1;
+//            outTmp[1] = 1;
 
             for PACKETSAMP {
                 switch(run)
