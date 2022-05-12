@@ -483,11 +483,11 @@ sample_t Regulator::bitsToSample(int ch, int frame)
 
 void Regulator::sampleToBits(sample_t sample, int ch, int frame)
 {
-//    AudioInterface::fromSampleToBitConversion(
-//        &sample,
-//        &mXfrBuffer[(frame * mBitResolutionMode * mNumChannels)
-//                    + (ch * mBitResolutionMode)],
-//        mBitResolutionMode);
+    AudioInterface::fromSampleToBitConversion(
+        &sample,
+        &mXfrBuffer[(frame * mBitResolutionMode * mNumChannels)
+                    + (ch * mBitResolutionMode)],
+        mBitResolutionMode);
 }
 
 //*******************************************************************************

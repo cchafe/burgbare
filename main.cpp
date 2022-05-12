@@ -1,5 +1,8 @@
 // https://c.mql5.com/3/133/Tutorial_on_Burg_smethod_algorithm_recursion.pdf
 
+// time ./burgBare input 48000 128 7 8 600 100 0 1 1
+
+
 #include <QCoreApplication>
 #include "burgalgorithm.h"
 #include <iostream>
@@ -10,7 +13,7 @@ using namespace stk;
 #include "Regulator.h"
 
 #define FS 48000.0
-QStringList runType = { "orig", "loss", "zero", "fade", "pred", "pure", "resi" };
+QStringList runType = { "orig", "loss", "zero", "fade", "pred", "pure", "resi", "regu" };
 enum Param { dummy, p_ifile, p_skip, p_fpp, p_run, p_hist, p_plen,
              p_rate, p_off, p_cons, p_stoc, p_ofile, p_lfile };
 int LOST[] = { 0, 2, 15, 16, 24, 26, 69, 70, 71, 72, 95, 97, 99, 344, 465, 466, 467, 644, 645, 702, 703, 704, 722, 723, 724, 872, 873, 980, 1110, 1111, 1112, 1321, 1322, 1407, 1408, 1409, 1411, 1415, 1416, 1417, 1418, 1465, 1477, 1479, 1531, 1532, 1533, 1534, 1710, 1719, 1720, 1721, 1722, 1724, 2060, 2061, 2062, 2063, 2114, 2115, 2116, 2235, 2236, 2237, 2238, 2239, 2240, 2241, 2249, 2250, 2251, 2273, 2390, 2391, 2392, 2393, 2399, 2408, 2600, 2601, 2602, 2635, 2688, 2689, 2849, 2850, 2869, 2870, 2871, 2872, 2919, 2920, 3103, 3104, 3269, 3270, 3308, 3309, 3343, 3344, 3345, 3346, 3404, 3405, 3406, 3438, 3439, 3472, 3488, 3489, 3558, 3559, 3560, 3722, 3723, 3830, 3831, 4034, 4044, 4045, 4115, 4116, 4117, 4118, 4190, 4191, 4192, 4194, 4322, 4323, 4352, 4353, 4359, 4956, 4957, 5206, 5207, 5759, 5845, 5848, 5849, 5866, 6006, 6007, 6039, 6040, 6103, 6104, 6148, 6149, 6175, 6176, 6177, 6179 };
@@ -132,11 +135,12 @@ int main(int argc, char *argv[])
     vector<long double> coeffs( TRAINSAMPS-2, 0.0 );
     vector<float> truth( fpp, 0.0 );
 
-    int len = (1 * mBitResolutionMode) * fpp; // 1 chan
-    const int8_t* truthTmp;
-    truthTmp = new int8_t[len / 8];
+    int len = (1 * 16) * fpp; // 1 chan, 16b
+    const int8_t* unusedTmp;
+//    truthTmp = new int8_t[len / 8];
     int8_t* outTmp;
     outTmp = new int8_t[len / 8];
+    std::memset(outTmp,0,len / 8);
 
     vector<float> xfadedPred( fpp, 0.0 );
     vector<float> nextPred( fpp, 0.0 );
@@ -183,7 +187,7 @@ int main(int argc, char *argv[])
         //                            phasor += 0.01;
         //                        }
         //        qDebug() << pCnt;
-regu.inputOnePacket(truthTmp, len, pCnt); // --not initialized yet
+regu.inputOnePacket(unusedTmp, len, pCnt); // --not initialized yet
         glitch = !((pCnt-off)%rate);
         if (stoc>0) {
             glitch = false;
@@ -235,6 +239,7 @@ regu.inputOnePacket(truthTmp, len, pCnt); // --not initialized yet
             }
 #define OUT(ch,x) (output[ch][THISPACKET+x])
             regu.outputOnePacket(outTmp);
+            outTmp[1] = 1;
 
             for PACKETSAMP {
                 switch(run)
@@ -264,7 +269,9 @@ regu.inputOnePacket(truthTmp, len, pCnt); // --not initialized yet
                     // predicted fade up, last predicted fade down
                     glitch = false;
                 }
-                case 7  : OUT(0,s) = outTmp[s];
+                case 7  : {
+                    OUT(0,s) = outTmp[s];
+}
                     break;
                 }
                 //                plot.write(OUT(0,s));

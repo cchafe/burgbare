@@ -47,10 +47,9 @@
 #include <QDebug>
 #include <QElapsedTimer>
 
-//#include "AudioInterface.h"
+#include "AudioInterface.h"
 //#include "RingBuffer.h"
-typedef float sample_t;
-#define mBitResolutionMode 16
+
 #define gVerboseFlag true
 
 class BurgAlgorithm
@@ -151,17 +150,18 @@ class Regulator // : public RingBuffer
     ///////////////////////////////////////////////////////
     bool inputOnePacket(const int8_t* ptrToSlot, int len, int lostLen) // aka writeAudioBuffer
     {
-        mBytes     = mFPP * mNumChannels * mBitResolutionMode;
-        memcpy(mXfrBuffer, ptrToSlot, mBytes);
+//        mBytes     = mFPP * mNumChannels * mBitResolutionMode;
+//        memcpy(mXfrBuffer, ptrToSlot, mBytes);
         for ( int s = 0; s < mFPP; s++ ) {
             mXfrBuffer[s] = 0.3*sin(mChanData[0]->phasor);
             mChanData[0]->phasor += 0.1;
         }
-        return insertSlotNonBlocking(ptrToSlot, len, lostLen);
+        return insertSlotNonBlocking(mXfrBuffer, len, lostLen);
     }
     void outputOnePacket(int8_t* ptrToReadSlot) // aka receiveNetworkPacket
     {
         readSlotNonBlocking(ptrToReadSlot);
+        sampleToBits(0.7, 0, 0);
     }
     ///////////////////////////////////////////////////////
 
