@@ -474,10 +474,10 @@ void Regulator::processChannel(int ch, bool glitch, int packetCnt, bool lastWasG
 sample_t Regulator::bitsToSample(int ch, int frame)
 {
     sample_t sample = 0.0;
-//    AudioInterface::fromBitToSampleConversion(
-//        &mXfrBuffer[(frame * mBitResolutionMode * mNumChannels)
-//                    + (ch * mBitResolutionMode)],
-//        &sample, mBitResolutionMode);
+        AudioInterface::fromBitToSampleConversion(
+            &mXfrBuffer[(frame * mBitResolutionMode * mNumChannels)
+                        + (ch * mBitResolutionMode)],
+            &sample, mBitResolutionMode);
     return sample;
 }
 
@@ -485,8 +485,7 @@ void Regulator::sampleToBits(sample_t sample, int ch, int frame)
 {
     AudioInterface::fromSampleToBitConversion(
         &sample,
-        &mXfrBuffer[(frame * mBitResolutionMode * mNumChannels)
-                    + (ch * mBitResolutionMode)],
+                &mXfrBuffer[(frame * mBitResolutionMode * mNumChannels) + (ch * mBitResolutionMode)],
         mBitResolutionMode);
 }
 

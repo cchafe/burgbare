@@ -156,12 +156,15 @@ class Regulator // : public RingBuffer
             mXfrBuffer[s] = 0.3*sin(mChanData[0]->phasor);
             mChanData[0]->phasor += 0.1;
         }
-        return insertSlotNonBlocking(mXfrBuffer, len, lostLen);
+        return insertSlotNonBlocking(mXfrBuffer, len, lostLen); // calls shimFPP
     }
     void outputOnePacket(int8_t* ptrToReadSlot) // aka receiveNetworkPacket
     {
-        readSlotNonBlocking(ptrToReadSlot);
-        sampleToBits(0.7, 0, 0);
+        readSlotNonBlocking(ptrToReadSlot); // calls pullPacket
+    }
+    sample_t outputOneSample(int i) // from mXfrBuffer
+    {
+        return (bitsToSample(0, i));
     }
     ///////////////////////////////////////////////////////
 

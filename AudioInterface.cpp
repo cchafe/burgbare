@@ -61,3 +61,41 @@ void AudioInterface::fromSampleToBitConversion(
         break;
     }
 }
+//*******************************************************************************
+void AudioInterface::fromBitToSampleConversion(
+    const int8_t* const input, sample_t* output,
+    const AudioInterface::audioBitResolutionT sourceBitResolution)
+{
+    int8_t tmp_8;
+    uint8_t tmp_u8;
+    int16_t tmp_16;
+    sample_t tmp_sample;
+    sample_t tmp_sample16;
+    sample_t tmp_sample8;
+    switch (sourceBitResolution) {
+    case BIT8:
+        tmp_8      = *input;
+        tmp_sample = static_cast<sample_t>(tmp_8) / 128.0;
+        std::memcpy(output, &tmp_sample, 4);  // 4 bytes
+        break;
+    case BIT16:
+        tmp_16     = *(reinterpret_cast<const int16_t*>(input));  // *((int16_t*) input);
+        tmp_sample = static_cast<sample_t>(tmp_16) / 32768.0;
+        std::memcpy(output, &tmp_sample, 4);  // 4 bytes
+        break;
+    case BIT24:
+        // We first extract the 16bit and 8bit number from the 3 bytes
+        tmp_16 = *(reinterpret_cast<const int16_t*>(input));
+        tmp_u8 = *(reinterpret_cast<const uint8_t*>(input + 2));
+
+        // Then we recover the number
+        tmp_sample16 = static_cast<sample_t>(tmp_16);
+        tmp_sample8  = static_cast<sample_t>(tmp_u8) / 256.0;
+        tmp_sample   = (tmp_sample16 + tmp_sample8) / 32768.0;
+        std::memcpy(output, &tmp_sample, 4);  // 4 bytes
+        break;
+    case BIT32:
+        std::memcpy(output, input, 4);  // 4 bytes
+        break;
+    }
+}

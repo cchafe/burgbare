@@ -19,6 +19,9 @@ public:
     static void fromSampleToBitConversion(
         const sample_t* const input, int8_t* output,
         const AudioInterface::audioBitResolutionT targetBitResolution);
+    static void fromBitToSampleConversion(
+        const int8_t* const input, sample_t* output,
+        const AudioInterface::audioBitResolutionT sourceBitResolution);
 };
 
 #endif // AUDIOINTERFACE_H

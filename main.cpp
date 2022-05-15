@@ -136,11 +136,14 @@ int main(int argc, char *argv[])
     vector<float> truth( fpp, 0.0 );
 
     int len = (1 * 16) * fpp; // 1 chan, 16b
-    const int8_t* unusedTmp;
-    //    truthTmp = new int8_t[len / 8];
+    int mBytes     = 128 * 1 * 2; // mBytes     = mFPP * mNumChannels * mBitResolutionMode;
+    int8_t* unusedTmp;
+    unusedTmp = new int8_t[mBytes];
+    std::memset(unusedTmp,0,mBytes);
+    const int8_t* unusedTmpConst = unusedTmp;
     int8_t* outTmp;
-    outTmp = new int8_t[len / 8];
-    std::memset(outTmp,0,len / 8);
+    outTmp = new int8_t[mBytes];
+    std::memset(outTmp,0,mBytes);
 
     vector<float> xfadedPred( fpp, 0.0 );
     vector<float> nextPred( fpp, 0.0 );
@@ -189,7 +192,7 @@ int main(int argc, char *argv[])
         //                            phasor += 0.01;
         //                        }
         //        qDebug() << pCnt;
-        regu.inputOnePacket(unusedTmp, len, pCnt); // --not initialized yet
+        regu.inputOnePacket(unusedTmpConst, len, pCnt);  // calls shimFPP // --not initialized yet
         glitch = !((pCnt-off)%rate);
         if (stoc>0) {
             glitch = false;
@@ -240,8 +243,7 @@ int main(int argc, char *argv[])
                         nextPred[s] * fadeDown[s];
             }
 #define OUT(ch,x) (output[ch][THISPACKET+x])
-            regu.outputOnePacket(outTmp);
-//            outTmp[1] = 1;
+            regu.outputOnePacket(outTmp); // calls pullPacket
 
             for PACKETSAMP {
                 switch(run)
@@ -272,7 +274,9 @@ int main(int argc, char *argv[])
                     glitch = false;
                 }
                 case 7  : {
-                    OUT(0,s) = outTmp[s];
+                    OUT(0,s) = regu.outputOneSample(s);
+                    if (s==0) OUT(0,s) = 0.5;
+                    if (s==30) OUT(0,s) = 0.5;
                 }
                     break;
                 }
