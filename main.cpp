@@ -1,6 +1,6 @@
 // https://c.mql5.com/3/133/Tutorial_on_Burg_smethod_algorithm_recursion.pdf
 
-// time ./burgBare input 48000 128 7 8 600 100 0 1 1
+// time ./burgBare input 48000 128 7 8 60 100 0 1 1
 
 
 #include <QCoreApplication>

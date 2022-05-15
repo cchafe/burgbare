@@ -19,6 +19,8 @@ c_defines = []
 incdirs = []
 
 src = [	'burgalgorithm.cpp',
+	'AudioInterface.cpp',
+	'Regulator.cpp',
 	'main.cpp',
 	'wavfileio.cpp']
 
