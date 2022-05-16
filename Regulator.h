@@ -148,23 +148,27 @@ class Regulator // : public RingBuffer
 //    //    virtual QString getStats(uint32_t statCount, uint32_t lostCount);
 //    virtual bool getStats(IOStat* stat, bool reset);
     ///////////////////////////////////////////////////////
+    void inputOneSample(sample_t in, int i) // to mXfrBuffer
+    {
+        sampleToBits(in, 0, i);
+    }
     bool inputOnePacket(const int8_t* ptrToSlot, int len, int lostLen) // aka writeAudioBuffer
     {
-//        mBytes     = mFPP * mNumChannels * mBitResolutionMode;
-//        memcpy(mXfrBuffer, ptrToSlot, mBytes);
+
         for ( int s = 0; s < mFPP; s++ ) {
             mXfrBuffer[s] = 0.3*sin(mChanData[0]->phasor);
             mChanData[0]->phasor += 0.1;
         }
+
         return insertSlotNonBlocking(mXfrBuffer, len, lostLen); // calls shimFPP
-    }
-    void outputOnePacket(int8_t* ptrToReadSlot) // aka receiveNetworkPacket
-    {
-        readSlotNonBlocking(ptrToReadSlot); // calls pullPacket
     }
     sample_t outputOneSample(int i) // from mXfrBuffer
     {
         return (bitsToSample(0, i));
+    }
+    void outputOnePacket(int8_t* ptrToReadSlot) // aka receiveNetworkPacket
+    {
+        readSlotNonBlocking(ptrToReadSlot); // calls pullPacket
     }
     ///////////////////////////////////////////////////////
 

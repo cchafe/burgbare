@@ -436,6 +436,7 @@ void Regulator::processChannel(int ch, bool glitch, int packetCnt, bool lastWasG
                              ? cd->mPrediction[s]
                              : ((lastWasGlitch) ? cd->mXfadedPred[s] : cd->mTruth[s]),
                          ch, s);
+//        sampleToBits(cd->mTruth[s],ch, s);
         if (glitch) {
             for (int s = 0; s < mFPP; s++)
                 cd->mLastPred[s] = cd->mPrediction[s + mFPP];

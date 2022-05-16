@@ -182,6 +182,7 @@ int main(int argc, char *argv[])
         if (shortIName!="none") {
             iwv.readFramesFromFor(THISPACKET, fpp, 1.0);
             for PACKETSAMP truth[s] = iwv.iframes.at(s);
+            for PACKETSAMP regu.inputOneSample( iwv.iframes.at(s), s);
         }
         //                for PACKETSAMP {
         //                    truth[s] = 0.3*sin(phasor);
@@ -275,8 +276,8 @@ int main(int argc, char *argv[])
                 }
                 case 7  : {
                     OUT(0,s) = regu.outputOneSample(s);
-                    if (s==0) OUT(0,s) = 0.5;
-                    if (s==30) OUT(0,s) = 0.5;
+//                    if (s==0) OUT(0,s) = 0.5;
+//                    if (s==30) OUT(0,s) = 0.5;
                 }
                     break;
                 }
