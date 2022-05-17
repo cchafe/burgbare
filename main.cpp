@@ -1,8 +1,8 @@
 // https://c.mql5.com/3/133/Tutorial_on_Burg_smethod_algorithm_recursion.pdf
 
-// time ./burgBare input 48000 128 7 8 60 100 0 1 1
-
-
+// time ./burgBare input 48000 128 7 8 6000 100 0 1 1
+// meson configure -Db_sanitize=address
+// meson configure -Dcpp_args='-D_GLIBCXX_ASSERTIONS'
 #include <QCoreApplication>
 #include "burgalgorithm.h"
 #include <iostream>
@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
                 qDebug() << nextLost;
             }
         }
-        regu.inputOnePacket(unusedTmpConst, mBytes, pCnt, glitch);  // calls shimFPP // --not initialized yet
+//        regu.inputOnePacket(unusedTmpConst, mBytes, pCnt, glitch);  // calls shimFPP // --not initialized yet
 
         if(pCnt) {
             if (glitch) {
