@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
                 qDebug() << nextLost;
             }
         }
-//        regu.inputOnePacket(unusedTmpConst, mBytes, pCnt, glitch);  // calls shimFPP // --not initialized yet
+        if(run == 7) regu.inputOnePacket(unusedTmpConst, mBytes, pCnt, glitch);  // calls shimFPP // --not initialized yet
 
         if(pCnt) {
             if (glitch) {
@@ -219,7 +219,11 @@ int main(int argc, char *argv[])
                 maxCons = (accCons>maxCons) ? accCons : maxCons;
                 accCons = 0;
             }
-            if(run > 2) {
+            if(run == 7)
+//            {}
+                regu.outputOnePacket(outTmp); // calls pullPacket
+            else
+                if(run > 2) {
                 // always update mTrain
                 for ( int i = 0; i < hist; i++ ) {
                     for PACKETSAMP train[s+((hist-(i+1))*fpp)] =  lastPackets[i][s];
@@ -243,7 +247,6 @@ int main(int argc, char *argv[])
                         nextPred[s] * fadeDown[s];
             }
 #define OUT(ch,x) (output[ch][THISPACKET+x])
-            regu.outputOnePacket(outTmp); // calls pullPacket
 
             for PACKETSAMP {
                 switch(run)

@@ -169,11 +169,13 @@ public:
     }
     sample_t outputOneSample(int i) // from mXfrBuffer
     {
+//        sampleToBits(0.5,0, i);
         return (bitsToSample(0, i));
     }
     void outputOnePacket(int8_t* ptrToReadSlot) // aka receiveNetworkPacket
     {
         readSlotNonBlocking(ptrToReadSlot); // calls pullPacket
+//        for (int s = 0; s < mFPP; s++) sampleToBits(0.75,0, s);
     }
     ///////////////////////////////////////////////////////
 
