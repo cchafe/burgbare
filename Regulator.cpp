@@ -374,6 +374,7 @@ PACKETOK : {
     else
         processPacket(false);
     pullStat->tick();
+
     goto OUTPUT;
 }
 
@@ -404,7 +405,7 @@ void Regulator::processPacket(bool glitch)
 //*******************************************************************************
 void Regulator::processChannel(int ch, bool glitch, int packetCnt, bool lastWasGlitch)
 {
-    //    if(glitch) qDebug() << "glitch"; else fprintf(stderr,".");
+        if(glitch) qDebug() << "glitch"; else fprintf(stderr,".");
     ChanData* cd = mChanData[ch];
     for (int s = 0; s < mFPP; s++)
         cd->mTruth[s] = bitsToSample(ch, s);

@@ -135,8 +135,7 @@ int main(int argc, char *argv[])
     vector<long double> coeffs( TRAINSAMPS-2, 0.0 );
     vector<float> truth( fpp, 0.0 );
 
-    int len = (1 * 16) * fpp; // 1 chan, 16b
-    int mBytes     = 128 * 1 * 2; // mBytes     = mFPP * mNumChannels * mBitResolutionMode;
+    int mBytes     = fpp * 1 * 2; // mBytes     = mFPP * mNumChannels * mBitResolutionMode;
     int8_t* unusedTmp;
     unusedTmp = new int8_t[mBytes];
     std::memset(unusedTmp,0,mBytes);
@@ -193,7 +192,7 @@ int main(int argc, char *argv[])
         //                            phasor += 0.01;
         //                        }
         //        qDebug() << pCnt;
-        regu.inputOnePacket(unusedTmpConst, len, pCnt);  // calls shimFPP // --not initialized yet
+        regu.inputOnePacket(unusedTmpConst, mBytes, pCnt);  // calls shimFPP // --not initialized yet
         glitch = !((pCnt-off)%rate);
         if (stoc>0) {
             glitch = false;

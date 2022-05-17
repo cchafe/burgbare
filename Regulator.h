@@ -155,11 +155,14 @@ class Regulator // : public RingBuffer
     bool inputOnePacket(const int8_t* ptrToSlot, int len, int lostLen) // aka writeAudioBuffer
     {
 
-        for ( int s = 0; s < mFPP; s++ ) {
-            mXfrBuffer[s] = 0.3*sin(mChanData[0]->phasor);
-            mChanData[0]->phasor += 0.1;
-        }
+        //for (int s = 0; s < mFPP; s++) sampleToBits(0.5,0, s);
 
+//                for ( int s = 0; s < mFPP; s++ ) {
+//                    sampleToBits(0.3*sin(mChanData[0]->phasor),0, s);
+//                    mChanData[0]->phasor += 0.1;
+//                }
+
+mMsecTolerance += (1.0 + (mFPP/48000.0)); // longer than IPI
         return insertSlotNonBlocking(mXfrBuffer, len, lostLen); // calls shimFPP
     }
     sample_t outputOneSample(int i) // from mXfrBuffer
