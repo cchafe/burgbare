@@ -395,6 +395,7 @@ OUTPUT:
 //*******************************************************************************
 void Regulator::processPacket(bool glitch)
 {
+    if (mForceGlitch) glitch = true;
     for (int ch = 0; ch < mNumChannels; ch++)
         processChannel(ch, glitch, mPacketCnt, mLastWasGlitch);
     mLastWasGlitch = glitch;

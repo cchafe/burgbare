@@ -192,7 +192,6 @@ int main(int argc, char *argv[])
         //                            phasor += 0.01;
         //                        }
         //        qDebug() << pCnt;
-        regu.inputOnePacket(unusedTmpConst, mBytes, pCnt);  // calls shimFPP // --not initialized yet
         glitch = !((pCnt-off)%rate);
         if (stoc>0) {
             glitch = false;
@@ -210,6 +209,7 @@ int main(int argc, char *argv[])
                 qDebug() << nextLost;
             }
         }
+        regu.inputOnePacket(unusedTmpConst, mBytes, pCnt, glitch);  // calls shimFPP // --not initialized yet
 
         if(pCnt) {
             if (glitch) {

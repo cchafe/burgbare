@@ -54,12 +54,12 @@
 
 class BurgAlgorithm
 {
-   public:
+public:
     bool classify(double d);
     void train(std::vector<long double>& coeffs, const std::vector<float>& x);
     void predict(std::vector<long double>& coeffs, std::vector<float>& tail);
 
-   private:
+private:
     // the following are class members to minimize heap memory allocations
     std::vector<long double> Ak;
     std::vector<long double> f;
@@ -68,7 +68,7 @@ class BurgAlgorithm
 
 class ChanData
 {
-   public:
+public:
     ChanData(int i, int FPP, int hist);
     int ch;
     int trainSamps;
@@ -90,7 +90,7 @@ class ChanData
 
 class StdDev
 {
-   public:
+public:
     StdDev(int id, QElapsedTimer* timer, int w);
     void tick();
     double calcAuto(double autoHeadroom);
@@ -107,7 +107,7 @@ class StdDev
     double longTermMax;
     double longTermMaxAcc;
 
-   private:
+private:
     void reset();
     QElapsedTimer* mTimer;
     std::vector<double> data;
@@ -122,7 +122,7 @@ class StdDev
 
 class Regulator // : public RingBuffer
 {
-   public:
+public:
     Regulator(int rcvChannels, int bit_res, int FPP, int qLen);
     virtual ~Regulator();
 
@@ -134,7 +134,7 @@ class Regulator // : public RingBuffer
     // instread of
     // if (!mJackTrip->writeAudioBuffer(src, host_buf_size, gap_size))
     virtual bool insertSlotNonBlocking(const int8_t* ptrToSlot, [[maybe_unused]] int len,
-                                       [[maybe_unused]] int seq_num)
+    [[maybe_unused]] int seq_num)
     {
         shimFPP(ptrToSlot, len, seq_num);
         return (true);
@@ -145,24 +145,26 @@ class Regulator // : public RingBuffer
     virtual void readSlotNonBlocking(int8_t* ptrToReadSlot) { pullPacket(ptrToReadSlot); }
 
     ///////////////////////////////////////////////////////
-//    //    virtual QString getStats(uint32_t statCount, uint32_t lostCount);
-//    virtual bool getStats(IOStat* stat, bool reset);
+    //    //    virtual QString getStats(uint32_t statCount, uint32_t lostCount);
+    //    virtual bool getStats(IOStat* stat, bool reset);
     ///////////////////////////////////////////////////////
     void inputOneSample(sample_t in, int i) // to mXfrBuffer
     {
         sampleToBits(in, 0, i);
     }
-    bool inputOnePacket(const int8_t* ptrToSlot, int len, int lostLen) // aka writeAudioBuffer
+    bool inputOnePacket(const int8_t* ptrToSlot, int len, int lostLen, int glitch) // aka writeAudioBuffer
     {
 
         //for (int s = 0; s < mFPP; s++) sampleToBits(0.5,0, s);
 
-//                for ( int s = 0; s < mFPP; s++ ) {
-//                    sampleToBits(0.3*sin(mChanData[0]->phasor),0, s);
-//                    mChanData[0]->phasor += 0.1;
-//                }
+        //                for ( int s = 0; s < mFPP; s++ ) {
+        //                    sampleToBits(0.3*sin(mChanData[0]->phasor),0, s);
+        //                    mChanData[0]->phasor += 0.1;
+        //                }
 
-mMsecTolerance += (1.0 + (mFPP/48000.0)); // longer than IPI
+        mMsecTolerance += (1.0 + (mFPP/48000.0)); // force it to be slightly longer than IPI
+        mForceGlitch = glitch;
+            //qDebug() << "glitch";
         return insertSlotNonBlocking(mXfrBuffer, len, lostLen); // calls shimFPP
     }
     sample_t outputOneSample(int i) // from mXfrBuffer
@@ -175,7 +177,7 @@ mMsecTolerance += (1.0 + (mFPP/48000.0)); // longer than IPI
     }
     ///////////////////////////////////////////////////////
 
-   private:
+private:
     void setFPPratio();
     bool mFPPratioIsSet;
     void processPacket(bool glitch);
@@ -224,5 +226,6 @@ mMsecTolerance += (1.0 + (mFPP/48000.0)); // longer than IPI
     void changeGlobal_2(int);
     void changeGlobal_3(int);
     void printParams();
+    bool mForceGlitch;
 };
 #endif  //__REGULATOR_H__
