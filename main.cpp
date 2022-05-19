@@ -209,6 +209,7 @@ int main(int argc, char *argv[])
                 qDebug() << nextLost;
             }
         }
+        if(run == 6) glitch = true;
         if(run == 7) regu.inputOnePacket(unusedTmpConst, mBytes, pCnt, glitch);  // calls shimFPP // --not initialized yet
 
         if(pCnt) {
@@ -239,7 +240,7 @@ int main(int argc, char *argv[])
 
                     ba.predict( coeffs, tail ); // resizes to TRAINSAMPS-2 + TRAINSAMPS
 
-                    for ( int i = 0; i < ORDER; i++ )
+                    for ( int i = 0; i < (ORDER-1); i++ )
                         prediction[i] = tail[i+TRAINSAMPS];
                 }
                 if (lastWasGlitch)
@@ -272,10 +273,11 @@ int main(int argc, char *argv[])
                 case 6  : {
                     double tmp = prediction[s] * fadeUp[s] +
                             nextPred[s] * fadeDown[s];
-                    OUT(0,s) = (s==0) ? tmp : tmp;
+                    OUT(0,s) = (s==-1) ? 0.9 : tmp;
                     // predicted fade up, last predicted fade down
                     glitch = false;
                 }
+                    break;
                 case 7  : {
                     OUT(0,s) = regu.outputOneSample(s);
 //                    if (s==0) OUT(0,s) = 0.5;
