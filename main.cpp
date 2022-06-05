@@ -77,7 +77,6 @@ int main(int argc, char *argv[])
     Stk::setSampleRate(FS);
     qInstallMessageHandler(qtMessageHandler);
     qDebug() << "preloaded" << LOSTLEN << "packet numbers (from recording):" << LOST[0] << ":" << LOST[LOSTLEN-1];
-    qDebug() << (runType[run]);
 
     for ( int i = 1; i < argc; i++ ) {
         QString tmpStr = QString::fromStdString(argv[i]);
@@ -111,6 +110,7 @@ int main(int argc, char *argv[])
                 DPY("stoc",stoc)
                 //             << shortOName << shortLName
                 ;
+    qDebug() << (runType[run]);
 
     if (hist >= rate)
         qDebug() << "!!!!!!!!!!! ------------- hist >= rate" << hist << rate;
@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
     int lostPtr = 0;
     int nextLost = LOST[lostPtr++];
     for ( int pCnt = 0; pCnt < plen; pCnt++) {
-        //        qDebug() << "pCnt" << pCnt;
+//                qDebug() << "pCnt" << pCnt;
         //        double mSimulatedLossRate;
         //        double mSimulatedJitterRate;
         //        double mSimulatedJitterMaxDelay;
@@ -181,6 +181,7 @@ int main(int argc, char *argv[])
         if (shortIName!="none") {
             iwv.readFramesFromFor(THISPACKET, fpp, 1.0);
             for PACKETSAMP truth[s] = iwv.iframes.at(s);
+            qDebug() << iwv.wavIn.isFinished();
             for PACKETSAMP regu.inputOneSample( iwv.iframes.at(s), s);
         }
         //                for PACKETSAMP {
@@ -209,6 +210,9 @@ int main(int argc, char *argv[])
                 qDebug() << nextLost;
             }
         }
+
+        glitch = iwv.wavIn.isFinished();
+
         if(run == 7) regu.inputOnePacket(unusedTmpConst, mBytes, pCnt, glitch);  // calls shimFPP // --not initialized yet
 
         if(pCnt) {
@@ -252,17 +256,22 @@ int main(int argc, char *argv[])
                 switch(run)
                 {
                 case 0  : OUT(0,s) = truth[s];
+//                    qDebug() << truth[s];
                     break;
                 case 1  : OUT(0,s) = (glitch) ? lastGoodPacket[s] : truth[s];
                     break;
                 case 2  : OUT(0,s) = (glitch) ? 0.0 : truth[s];
                     break;
-                case 3  :
-                    OUT(0,s) =
+                case 3  : {
+                    double tmp =
                             (glitch) ? prediction[s]
                                        : ( (lastWasGlitch) ?
                                                xfadedPred[ s ]
                                                : truth[s] );
+                    double tmp2 =
+                            (glitch) ?  -0.9 : tmp;
+                    OUT(0,s) = (s==0) ? tmp2 : tmp;
+                }
                     break;
                 case 4  :
                     OUT(0,s) = (glitch) ? prediction[s] : truth[s];
@@ -272,10 +281,11 @@ int main(int argc, char *argv[])
                 case 6  : {
                     double tmp = prediction[s] * fadeUp[s] +
                             nextPred[s] * fadeDown[s];
-                    OUT(0,s) = (s==0) ? tmp : tmp;
+                    OUT(0,s) = tmp; // (s==0) ? -0.5 : tmp;
                     // predicted fade up, last predicted fade down
                     glitch = false;
                 }
+                    break;
                 case 7  : {
                     OUT(0,s) = regu.outputOneSample(s);
 //                    if (s==0) OUT(0,s) = 0.5;
