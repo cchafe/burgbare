@@ -1,5 +1,19 @@
 // chuck -s dataReaderColumn.ck temp2wav.ck
 
+/*
+cd ck
+chuck -s dataReaderColumn.ck temp2wav.ck
+cp ../TIKSI.dat.wav /tmp/t.wav 
+
+in ../
+time ./burgBare t 0 32 0 6 52 100 0 1 1
+time ./burgBare t 0 32 3 6 22 100 0 1 1
+
+compare immediate prediction in 
+/tmp/testorig.snd
+/tmp/testfade.snd
+*/
+
 //"../zagreb-monthly.dat" => string filename;
 "../TIKSI.dat" => string filename;
 <<<filename>>>;
