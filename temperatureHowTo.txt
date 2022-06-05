@@ -1,0 +1,9 @@
+case 6 (resi) needs fix -- missing closing break;
+
+10 samp downsamp
+
+chuck -s dataReaderColumn.ck temp2wav.ck
+
+don't skip -- used to be skip 48000
+
+time ./burgBare z 0 128 0 8 60 100 0 1 1
